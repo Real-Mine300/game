@@ -1,3 +1,60 @@
-			#player1{
-				background: red;
-			}
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      background-color: rgb(230, 240, 255);
+      font-family: Arial, sans-serif;
+    }
+
+    .playerProperties {
+      width: 80px;
+      height: 80px;
+      display: inline-block;
+    }
+
+    #player1 {
+      background-color: red;
+    }
+
+    #player2 {
+      background-color: blue;
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="player1" class="playerProperties">p1</div>
+    <div id="player2" class="playerProperties">p2</div>
+  </div>
+  <p id="troubleShoot">
+    yo wsg.
+  </p>
+  <script>
+    const player1 = document.getElementById('player1');
+    const player2 = document.getElementById('player2');
+    const trouble = document.getElementById('troubleShoot');
+
+    // Log elements and styles
+    console.log(trouble);
+    console.log(player2);
+    console.log(player2.style.backgroundColor);
+    console.log(player2.style.marginLeft);
+
+    // Dynamically increase the margin of player2
+    let currentMargin = parseInt(window.getComputedStyle(player2).marginLeft);
+    console.log("Current Margin:", currentMargin);
+
+    // Function to increase the margin of player2
+    function increaseMargin() {
+      currentMargin += 10; // Increase margin by 10px
+      player2.style.marginLeft = currentMargin + "px";
+      console.log("Updated Margin:", currentMargin);
+    }
+
+    // Call the function to increase the margin
+    increaseMargin();
+  </script>
+</body>
+</html>
