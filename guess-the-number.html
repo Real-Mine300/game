@@ -20,7 +20,7 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 350px;
         }
 
         h1 {
@@ -107,6 +107,20 @@
             color: #5d4037;
         }
 
+        .guess-log {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .guess-log ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .guess-log li {
+            margin: 5px 0;
+        }
+
     </style>
 </head>
 <body class="light-theme">
@@ -118,8 +132,14 @@
         <p id="feedback"></p>
         <p id="attempts">Attempts: 0</p>
         <p id="result"></p>
+        <p>Best Score: <span id="best-score">N/A</span></p>
         <button id="reset">Reset Game</button>
-        
+
+        <div class="guess-log">
+            <h3>Guess Log</h3>
+            <ul id="log"></ul>
+        </div>
+
         <div class="theme-selector">
             <button class="theme-btn" id="light-theme">Light</button>
             <button class="theme-btn" id="dark-theme">Dark</button>
@@ -133,6 +153,7 @@
     <script>
         let targetNumber;
         let attempts = 0;
+        let bestScore = localStorage.getItem("bestScore") ? parseInt(localStorage.getItem("bestScore")) : Infinity;
 
         // Function to generate a random number between 1 and 100
         function generateNumber() {
@@ -141,12 +162,26 @@
             document.getElementById("attempts").textContent = `Attempts: ${attempts}`;
             document.getElementById("feedback").textContent = "";
             document.getElementById("result").textContent = "";
+            document.getElementById("log").innerHTML = "";
         }
 
-        // Handle the guess submission
-        document.getElementById("submit-guess").addEventListener("click", function () {
+        // Function to update the best score
+        function updateBestScore() {
+            if (attempts < bestScore) {
+                bestScore = attempts;
+                localStorage.setItem("bestScore", bestScore);
+                document.getElementById("best-score").textContent = bestScore;
+            }
+        }
+
+        // Function to handle the guess submission
+        function handleGuess() {
             const guess = parseInt(document.getElementById("guess").value);
             attempts++;
+
+            const guessItem = document.createElement("li");
+            guessItem.textContent = `Guess #${attempts}: ${guess}`;
+            document.getElementById("log").appendChild(guessItem);
 
             if (guess > targetNumber) {
                 document.getElementById("feedback").textContent = "Too high!";
@@ -158,9 +193,20 @@
                 document.getElementById("feedback").textContent = "Correct!";
                 document.getElementById("feedback").style.color = "green";
                 document.getElementById("result").textContent = `You guessed the number in ${attempts} attempts!`;
+                updateBestScore();
             }
 
             document.getElementById("attempts").textContent = `Attempts: ${attempts}`;
+        }
+
+        // Handle the submit button click
+        document.getElementById("submit-guess").addEventListener("click", handleGuess);
+
+        // Handle submitting with the Enter key
+        document.getElementById("guess").addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                handleGuess();
+            }
         });
 
         // Handle the reset functionality
@@ -188,6 +234,7 @@
 
         // Initialize the game when the page loads
         generateNumber();
+        document.getElementById("best-score").textContent = bestScore === Infinity ? "N/A" : bestScore;
     </script>
 </body>
 </html>
