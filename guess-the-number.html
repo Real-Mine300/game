@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        .game-container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            width: 60%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+
+        #submit-guess {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        #submit-guess:hover {
+            background-color: #45a049;
+        }
+
+        #reset {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+
+        #reset:hover {
+            background-color: #e53935;
+        }
+
+        .theme-selector {
+            margin-top: 20px;
+        }
+
+        .theme-btn {
+            margin: 5px;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .light-theme {
+            background-color: #fff;
+            color: #333;
+        }
+
+        .dark-theme {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .nature-theme {
+            background-color: #e0f7e0;
+            color: #3b4d3b;
+        }
+
+        .oceans-theme {
+            background-color: #e0f7fa;
+            color: #00796b;
+        }
+
+        .cosmos-theme {
+            background-color: #1c1c1c;
+            color: #9e9e9e;
+            background-image: url('https://www.nasa.gov/sites/default/files/thumbnails/202104_nasa_moon.jpg'); 
+            background-size: cover;
+        }
+
+        .desert-theme {
+            background-color: #f1c27d;
+            color: #5d4037;
+        }
+
+    </style>
+</head>
+<body class="light-theme">
+    <div class="game-container">
+        <h1>Guess the Number</h1>
+        <p>Guess a number between 1 and 100:</p>
+        <input type="number" id="guess" placeholder="Enter your guess">
+        <button id="submit-guess">Submit Guess</button>
+        <p id="feedback"></p>
+        <p id="attempts">Attempts: 0</p>
+        <p id="result"></p>
+        <button id="reset">Reset Game</button>
+        
+        <div class="theme-selector">
+            <button class="theme-btn" id="light-theme">Light</button>
+            <button class="theme-btn" id="dark-theme">Dark</button>
+            <button class="theme-btn" id="nature-theme">Nature</button>
+            <button class="theme-btn" id="oceans-theme">Oceans</button>
+            <button class="theme-btn" id="cosmos-theme">Cosmos</button>
+            <button class="theme-btn" id="desert-theme">Desert</button>
+        </div>
+    </div>
+
+    <script>
+        let targetNumber;
+        let attempts = 0;
+
+        // Function to generate a random number between 1 and 100
+        function generateNumber() {
+            targetNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            document.getElementById("attempts").textContent = `Attempts: ${attempts}`;
+            document.getElementById("feedback").textContent = "";
+            document.getElementById("result").textContent = "";
+        }
+
+        // Handle the guess submission
+        document.getElementById("submit-guess").addEventListener("click", function () {
+            const guess = parseInt(document.getElementById("guess").value);
+            attempts++;
+
+            if (guess > targetNumber) {
+                document.getElementById("feedback").textContent = "Too high!";
+                document.getElementById("feedback").style.color = "red";
+            } else if (guess < targetNumber) {
+                document.getElementById("feedback").textContent = "Too low!";
+                document.getElementById("feedback").style.color = "blue";
+            } else {
+                document.getElementById("feedback").textContent = "Correct!";
+                document.getElementById("feedback").style.color = "green";
+                document.getElementById("result").textContent = `You guessed the number in ${attempts} attempts!`;
+            }
+
+            document.getElementById("attempts").textContent = `Attempts: ${attempts}`;
+        });
+
+        // Handle the reset functionality
+        document.getElementById("reset").addEventListener("click", generateNumber);
+
+        // Theme switching functionality
+        document.getElementById("light-theme").addEventListener("click", function () {
+            document.body.className = "light-theme";
+        });
+        document.getElementById("dark-theme").addEventListener("click", function () {
+            document.body.className = "dark-theme";
+        });
+        document.getElementById("nature-theme").addEventListener("click", function () {
+            document.body.className = "nature-theme";
+        });
+        document.getElementById("oceans-theme").addEventListener("click", function () {
+            document.body.className = "oceans-theme";
+        });
+        document.getElementById("cosmos-theme").addEventListener("click", function () {
+            document.body.className = "cosmos-theme";
+        });
+        document.getElementById("desert-theme").addEventListener("click", function () {
+            document.body.className = "desert-theme";
+        });
+
+        // Initialize the game when the page loads
+        generateNumber();
+    </script>
+</body>
+</html>
