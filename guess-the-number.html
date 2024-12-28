@@ -20,7 +20,21 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 350px;
+            width: 450px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .game-content {
+            flex: 1;
+        }
+
+        .log-container {
+            flex: 1;
+            margin-left: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
@@ -115,38 +129,54 @@
         .guess-log ul {
             list-style-type: none;
             padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .guess-log li {
             margin: 5px 0;
         }
 
+        .guess-high {
+            color: red;
+        }
+
+        .guess-low {
+            color: blue;
+        }
+
+        .guess-correct {
+            color: green;
+        }
+
     </style>
 </head>
 <body class="light-theme">
     <div class="game-container">
-        <h1>Guess the Number</h1>
-        <p>Guess a number between 1 and 100:</p>
-        <input type="number" id="guess" placeholder="Enter your guess">
-        <button id="submit-guess">Submit Guess</button>
-        <p id="feedback"></p>
-        <p id="attempts">Attempts: 0</p>
-        <p id="result"></p>
-        <p>Best Score: <span id="best-score">N/A</span></p>
-        <button id="reset">Reset Game</button>
+        <div class="game-content">
+            <h1>Guess the Number</h1>
+            <p>Guess a number between 1 and 100:</p>
+            <input type="number" id="guess" placeholder="Enter your guess" min="1" max="100">
+            <button id="submit-guess">Submit Guess</button>
+            <p id="feedback"></p>
+            <p id="attempts">Attempts: 0</p>
+            <p id="result"></p>
+            <p>Best Score: <span id="best-score">N/A</span></p>
+            <button id="reset">Reset Game</button>
 
-        <div class="guess-log">
-            <h3>Guess Log</h3>
-            <ul id="log"></ul>
+            <div class="theme-selector">
+                <button class="theme-btn" id="light-theme">Light</button>
+                <button class="theme-btn" id="dark-theme">Dark</button>
+                <button class="theme-btn" id="nature-theme">Nature</button>
+                <button class="theme-btn" id="oceans-theme">Oceans</button>
+                <button class="theme-btn" id="cosmos-theme">Cosmos</button>
+                <button class="theme-btn" id="desert-theme">Desert</button>
+            </div>
         </div>
 
-        <div class="theme-selector">
-            <button class="theme-btn" id="light-theme">Light</button>
-            <button class="theme-btn" id="dark-theme">Dark</button>
-            <button class="theme-btn" id="nature-theme">Nature</button>
-            <button class="theme-btn" id="oceans-theme">Oceans</button>
-            <button class="theme-btn" id="cosmos-theme">Cosmos</button>
-            <button class="theme-btn" id="desert-theme">Desert</button>
+        <div class="log-container">
+            <h3>Guess Log</h3>
+            <ul id="log"></ul>
         </div>
     </div>
 
@@ -176,27 +206,37 @@
 
         // Function to handle the guess submission
         function handleGuess() {
-            const guess = parseInt(document.getElementById("guess").value);
-            attempts++;
+            let guess = parseInt(document.getElementById("guess").value);
 
-            const guessItem = document.createElement("li");
-            guessItem.textContent = `Guess #${attempts}: ${guess}`;
-            document.getElementById("log").appendChild(guessItem);
-
-            if (guess > targetNumber) {
-                document.getElementById("feedback").textContent = "Too high!";
-                document.getElementById("feedback").style.color = "red";
-            } else if (guess < targetNumber) {
-                document.getElementById("feedback").textContent = "Too low!";
-                document.getElementById("feedback").style.color = "blue";
+            // Ensure guesses are within the range of 1 to 100
+            if (guess < 1) {
+                guess = 1;
+                logGuess(guess, "Too low!", "guess-low");
+            } else if (guess > 100) {
+                guess = 100;
+                logGuess(guess, "Too high!", "guess-high");
             } else {
-                document.getElementById("feedback").textContent = "Correct!";
-                document.getElementById("feedback").style.color = "green";
-                document.getElementById("result").textContent = `You guessed the number in ${attempts} attempts!`;
-                updateBestScore();
+                if (guess > targetNumber) {
+                    logGuess(guess, "Too high!", "guess-high");
+                } else if (guess < targetNumber) {
+                    logGuess(guess, "Too low!", "guess-low");
+                } else {
+                    logGuess(guess, "Correct!", "guess-correct");
+                    document.getElementById("result").textContent = `You guessed the number in ${attempts} attempts!`;
+                    updateBestScore();
+                }
             }
 
+            attempts++;
             document.getElementById("attempts").textContent = `Attempts: ${attempts}`;
+        }
+
+        // Log the guess with appropriate feedback
+        function logGuess(guess, feedback, feedbackClass) {
+            const guessItem = document.createElement("li");
+            guessItem.textContent = `Guess #${attempts}: ${guess} - ${feedback}`;
+            guessItem.classList.add(feedbackClass);
+            document.getElementById("log").appendChild(guessItem);
         }
 
         // Handle the submit button click
