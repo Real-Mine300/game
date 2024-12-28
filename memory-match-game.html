@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            transition: background-color 0.3s ease;
+        }
+
+        #theme-selection {
+            text-align: center;
+        }
+
+        #game-container.hidden {
+            display: none;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-gap: 10px;
+            margin: 20px 0;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #ccc;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card img {
+            width: 60%;
+            height: 60%;
+            display: none;
+        }
+
+        .card.flipped img {
+            display: block;
+        }
+
+        #status {
+            text-align: center;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Theme Styles */
+        body.light {
+            background-color: #f0f0f0;
+        }
+
+        body.dark {
+            background-color: #333;
+            color: white;
+        }
+
+        body.nature {
+            background-color: #e0f7fa;
+        }
+
+        body.oceans {
+            background-color: #004d80;
+            color: white;
+        }
+
+        body.cosmos {
+            background-color: #2d2d72;
+            color: white;
+        }
+
+        body.desert {
+            background-color: #f2d8a6;
+        }
+    </style>
+</head>
+<body>
+    <div id="theme-selection">
+        <h1>Memory Match Game</h1>
+        <label for="theme">Select Theme:</label>
+        <select id="theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="nature">Nature</option>
+            <option value="oceans">Oceans</option>
+            <option value="cosmos">Cosmos</option>
+            <option value="desert">Desert</option>
+        </select>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+    
+    <div id="game-container" class="hidden">
+        <div id="board"></div>
+        <div id="status">
+            <p>Moves: <span id="moves">0</span></p>
+            <p id="win-message" class="hidden">You Win!</p>
+            <button onclick="resetGame()">Reset Game</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedTheme = '';
+        let cards = [];
+        let flippedCards = [];
+        let matchedCards = [];
+        let moves = 0;
+
+        const themeIcons = {
+            light: ['1', '2', '3', '4', '5', '6', '7', '8'],
+            dark: ['🌙', '⭐', '🌑', '☄️', '💫', '🌠', '🌌', '🌘'],
+            nature: ['🌳', '🍃', '🐦', '🌸', '🌱', '🌻', '🐝', '🦋'],
+            oceans: ['🐠', '🐟', '🐳', '🐙', '🐚', '🌊', '🏝️', '🌊'],
+            cosmos: ['🌍', '🌑', '🌟', '☄️', '🌘', '🌙', '⭐', '🪐'],
+            desert: ['🌵', '🏜️', '🐪', '🌞', '🌵', '🏜️', '🐪', '🌞']
+        };
+
+        function startGame() {
+            selectedTheme = document.getElementById("theme").value;
+            document.body.className = selectedTheme; // Apply theme to the body
+            document.getElementById("theme-selection").classList.add('hidden');
+            document.getElementById("game-container").classList.remove('hidden');
+            moves = 0;
+            document.getElementById("moves").textContent = moves;
+            matchedCards = [];
+            createCards();
+            shuffleCards();
+        }
+
+        function createCards() {
+            const board = document.getElementById("board");
+            board.innerHTML = '';
+            const selectedIcons = themeIcons[selectedTheme];
+            const gameCards = [...selectedIcons, ...selectedIcons];
+
+            gameCards.forEach(icon => {
+                const card = document.createElement("div");
+                card.classList.add("card");
+                card.setAttribute("data-icon", icon);
+                card.innerHTML = `<img src="#" alt="${icon}" />`;
+                card.addEventListener('click', flipCard);
+                board.appendChild(card);
+            });
+        }
+
+        function flipCard(event) {
+            const card = event.target;
+            if (flippedCards.length < 2 && !card.classList.contains("flipped") && !matchedCards.includes(card)) {
+                card.classList.add("flipped");
+                card.querySelector("img").textContent = card.getAttribute("data-icon");
+                flippedCards.push(card);
+                if (flippedCards.length === 2) {
+                    checkMatch();
+                }
+            }
+        }
+
+        function checkMatch() {
+            moves++;
+            document.getElementById("moves").textContent = moves;
+
+            const [card1, card2] = flippedCards;
+            if (card1.getAttribute("data-icon") === card2.getAttribute("data-icon")) {
+                matchedCards.push(card1, card2);
+                flippedCards = [];
+                if (matchedCards.length === cards.length) {
+                    document.getElementById("win-message").classList.remove('hidden');
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove("flipped");
+                    card2.classList.remove("flipped");
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        function shuffleCards() {
+            const board = document.getElementById("board");
+            const cardsArray = Array.from(board.children);
+            for (let i = cardsArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cardsArray[i], cardsArray[j]] = [cardsArray[j], cardsArray[i]];
+            }
+            cardsArray.forEach(card => board.appendChild(card));
+        }
+
+        function resetGame() {
+            document.getElementById("win-message").classList.add('hidden');
+            document.getElementById("theme-selection").classList.remove('hidden');
+            document.getElementById("game-container").classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
