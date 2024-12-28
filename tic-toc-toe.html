@@ -66,6 +66,10 @@
             margin: 5px;
         }
 
+        .mode-buttons button {
+            margin: 5px;
+        }
+
         /* Themes */
         body.light {
             background-color: #f0f0f0;
@@ -103,6 +107,22 @@
         body {
             transition: background-color 0.3s, color 0.3s;
         }
+
+        /* Colors for X and O based on theme */
+        .x {
+            color: red;
+        }
+
+        .o {
+            color: blue;
+        }
+
+        /* Bot move */
+        .bot-move {
+            font-size: 3em;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body class="light">
@@ -122,6 +142,10 @@
         </div>
         <div class="controls">
             <button id="reset-btn">Reset Game</button>
+            <div class="mode-buttons">
+                <button id="two-player-btn">2 Player</button>
+                <button id="one-player-btn">1 Player</button>
+            </div>
             <div class="theme-buttons">
                 <button id="light-btn">Light</button>
                 <button id="dark-btn">Dark</button>
@@ -136,10 +160,14 @@
         const cells = document.querySelectorAll('.cell');
         const gameStatus = document.getElementById('game-status');
         const resetButton = document.getElementById('reset-btn');
+        const twoPlayerButton = document.getElementById('two-player-btn');
+        const onePlayerButton = document.getElementById('one-player-btn');
         let currentPlayer = 'X';
         let gameBoard = ['', '', '', '', '', '', '', '', ''];
         let isGameActive = true;
+        let isOnePlayerMode = false;
 
+        // Function to check if there's a winner
         const checkWinner = () => {
             const winPatterns = [
                 [0, 1, 2],
@@ -165,6 +193,22 @@
             }
         };
 
+        // Function for the bot's move (random move)
+        const botMove = () => {
+            let availableMoves = gameBoard.map((val, index) => val === '' ? index : null).filter(val => val !== null);
+            if (availableMoves.length > 0) {
+                const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+                gameBoard[randomMove] = 'O';
+                cells[randomMove].textContent = 'O';
+                checkWinner();
+                if (isGameActive) {
+                    currentPlayer = 'X';
+                    gameStatus.textContent = `Player 1's turn (X)`;
+                }
+            }
+        };
+
+        // Handle cell click
         const handleCellClick = (e) => {
             const index = e.target.getAttribute('data-index');
             if (gameBoard[index] || !isGameActive) return;
@@ -177,9 +221,13 @@
             if (isGameActive) {
                 currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
                 gameStatus.textContent = `Player ${currentPlayer === 'X' ? '1' : '2'}'s turn (${currentPlayer})`;
+                if (isOnePlayerMode && currentPlayer === 'O') {
+                    setTimeout(botMove, 500); // Bot makes a move after a short delay
+                }
             }
         };
 
+        // Reset the game
         const resetGame = () => {
             gameBoard = ['', '', '', '', '', '', '', '', ''];
             isGameActive = true;
@@ -188,16 +236,30 @@
             cells.forEach(cell => cell.textContent = '');
         };
 
-        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
-        resetButton.addEventListener('click', resetGame);
+        // Handle mode switch
+        twoPlayerButton.addEventListener('click', () => {
+            isOnePlayerMode = false;
+            resetGame();
+        });
 
-        // Theme Switching
+        onePlayerButton.addEventListener('click', () => {
+            isOnePlayerMode = true;
+            resetGame();
+        });
+
+        // Handle theme switching
         document.getElementById('light-btn').addEventListener('click', () => document.body.className = 'light');
         document.getElementById('dark-btn').addEventListener('click', () => document.body.className = 'dark');
         document.getElementById('nature-btn').addEventListener('click', () => document.body.className = 'nature');
         document.getElementById('oceans-btn').addEventListener('click', () => document.body.className = 'oceans');
         document.getElementById('cosmos-btn').addEventListener('click', () => document.body.className = 'cosmos');
         document.getElementById('desert-btn').addEventListener('click', () => document.body.className = 'desert');
+
+        // Add event listener to each cell
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+
+        // Reset the game
+        resetButton.addEventListener('click', resetGame);
     </script>
 </body>
 </html>
